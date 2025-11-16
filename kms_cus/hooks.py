@@ -21,6 +21,20 @@ app_license = "mit"
 # 	}
 # ]
 
+doctype_js = {
+    "Sales Invoice": [
+        "public/js/sales_invoice_outstanding.js",
+        "public/js/sales_invoice_batch_rate.js",
+        "public/js/sales_invoice_item_barcode.js"
+    ]
+}
+
+doc_events = {
+    "Purchase Receipt": {
+        "on_submit": "kms_cus.api.batch_price.update_batch_price"
+    }
+}
+
 # Includes in <head>
 # ------------------
 
