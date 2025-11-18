@@ -2,6 +2,20 @@
 // SALES INVOICE – Inline Manual + Add Button + QR Scan Icon (Camera)
 // ===================================================================
 
+setInterval(() => {
+    const oldDialog = frappe.ui.Dialog;
+
+    frappe.ui.Dialog = class extends oldDialog {
+        constructor(opts) {
+            if (opts && opts.title && opts.title.includes("Add Batch Nos")) {
+                console.log("Batch popup forcibly blocked");
+                return;
+            }
+            super(opts);
+        }
+    };
+}, 500);
+
 frappe.ui.form.on("Sales Invoice", {
   refresh(frm) {
     render_inline_barcode_ui(frm);
