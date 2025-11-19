@@ -35,6 +35,9 @@ doc_events = {
     },
     "Stock Reconciliation": {
         "on_submit": "kms_cus.api.batch_price.generate_barcode_for_stock_reconciliation"
+    },
+    "Sales Invoice": {
+        "on_submit": "kms_cus.api.batch_price.create_selling_price_from_sales_invoice"
     }
 }
 
