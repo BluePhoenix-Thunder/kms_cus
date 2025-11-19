@@ -15,11 +15,6 @@ def generate_ean13_code(prefix="890"):
 # MAIN FUNCTION – ON PURCHASE RECEIPT SUBMIT
 # ---------------------------------------------------------
 def update_batch_price(doc, method):
-    """
-    Called from Purchase Receipt hooks.
-    Allows manual selling price entry for batch (separate from purchase rate).
-    """
-
     for item in doc.items:
         if not item.batch_no:
             continue
@@ -28,24 +23,42 @@ def update_batch_price(doc, method):
         item_code = item.item_code
         purchase_rate = item.rate
 
-        # Fetch manually entered selling price from Batch
         custom_selling_price = frappe.db.get_value("Batch", batch_no, "custom_selling_price")
-
-        # If user didn’t enter, default to purchase rate
         selling_price = custom_selling_price or purchase_rate
 
-        # Store selling price in Batch
         frappe.db.set_value("Batch", batch_no, "custom_selling_price", selling_price)
 
-        # Create or update Item Prices
         create_buying_price(item_code, purchase_rate, batch_no)
         create_global_selling_price(item_code, selling_price, batch_no)
 
-        # Ensure barcode exists
         existing_barcode = frappe.db.get_value("Batch", batch_no, "custom_barcode")
         if not existing_barcode:
             ean13_code = generate_ean13_code(prefix="890")
             frappe.db.set_value("Batch", batch_no, "custom_barcode", ean13_code)
+
+
+# ---------------------------------------------------------
+# AUTO-GENERATE BARCODE FOR STOCK RECONCILIATION (OPENING STOCK)
+# ---------------------------------------------------------
+def generate_barcode_for_stock_reconciliation(doc, method):
+    """
+    Triggered on Stock Reconciliation SUBMIT.
+    Auto-generate barcode for batches created via opening stock.
+    """
+    for item in doc.items:
+        if not item.batch_no:
+            continue
+
+        batch_no = item.batch_no
+
+        # If already has barcode → skip
+        existing = frappe.db.get_value("Batch", batch_no, "custom_barcode")
+        if existing:
+            continue
+
+        # Generate barcode
+        ean13_code = generate_ean13_code(prefix="890")
+        frappe.db.set_value("Batch", batch_no, "custom_barcode", ean13_code)
 
 
 # ---------------------------------------------------------

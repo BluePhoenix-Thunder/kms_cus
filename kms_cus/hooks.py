@@ -32,6 +32,9 @@ doctype_js = {
 doc_events = {
     "Purchase Receipt": {
         "on_submit": "kms_cus.api.batch_price.update_batch_price"
+    },
+    "Stock Reconciliation": {
+        "on_submit": "kms_cus.api.batch_price.generate_barcode_for_stock_reconciliation"
     }
 }
 
